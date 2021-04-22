@@ -40,9 +40,10 @@ namespace WechatMessageMerageDemo.MessageMeragers
             }
             foreach (var talkerMessages in meragedMessages.GroupBy(m => new TalkerKey() { Talker = m.Talker, IsSend = m.IsSend }, new TalkerEqualityComparer()).OrderBy(g => g.Key.Talker))
             {
-                Console.WriteLine($" ===> {talkerMessages.Key.Talker} {(talkerMessages.Key.IsSend ? "Send" : "Receive")} {talkerMessages.Count()} messsages totally.");
-                var uniqueMessages = new HashSet<WechatMessage>(talkerMessages, new MessageEqualityComparer());
-                Console.WriteLine($"\t===> Removed {talkerMessages.Count() - uniqueMessages.Count()} duplicated messages.");
+                int mobileMessageCount = mobileMessagesByTalker.TryGetValue(new TalkerKey() { Talker = talkerMessages.Key.Talker, IsSend = talkerMessages.Key.IsSend }, out var messages) ? messages.Count() : 0;
+                int pcMessageCount = pcMessagesByTalker.TryGetValue(new TalkerKey() { Talker = talkerMessages.Key.Talker, IsSend = talkerMessages.Key.IsSend }, out messages) ? messages.Count() : 0;
+                Console.WriteLine($" ===> {talkerMessages.Key.Talker} {(talkerMessages.Key.IsSend ? "Send" : "Receive")} {mobileMessageCount + pcMessageCount} messsages totally.");
+                Console.WriteLine($"\t===> Removed {talkerMessages.Count()} duplicated messages.");
             }
 
             return meragedMessages;
