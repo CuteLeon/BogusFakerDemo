@@ -1,0 +1,37 @@
+public IEnumerable<WechatMessage> Merage(IEnumerable<WechatMessage> mobileMessages, IEnumerable<WechatMessage> pcMessages)
+{
+    var mobileMessagesByTalker = mobileMessages
+        .GroupBy(m => { Talker = m.Talker, IsSend = m.IsSend }, (x, y) => KMPHeler.Equals(x.Talker, y.Talker) && x.IsSend == y.IsSend)
+        .ToDictionary(g => g.Key); // 将移动端微信消息按交互方和收发标记分组
+    var pcMessagesByTalker = pcMessages
+        .GroupBy(m => { Talker = m.Talker, IsSend = m.IsSend }, (x, y) => KMPHeler.Equals(x.Talker, y.Talker) && x.IsSend == y.IsSend)
+        .ToDictionary(g => g.Key); // 将PC端微信消息按交互方和收发标记分组
+    var meragedMessages = new List<WechatMessage>(mobileMessages.Count() + pcMessages.Count());
+    meragedMessages.AddRange(mobileMessages); // 使用移动端所有消息记录初始化消息集合
+    foreach (var pcTalkerMessages in pcMessagesByTalker) // 遍历PC端所有交互方
+    {
+        if (mobileMessagesByTalker.TryGetValue(new TalkerKey { Talker = pcTalkerMessages.Key.Talker, IsSend = pcTalkerMessages.Key.IsSend }, out var mobileTalkerMessages))
+        { // 如果移动端存在此PC端的交互方，计算移动端此交互方所有消息收发时间的Hash列表
+            var mobileMessagesHashSet = new HashSet<WechatMessage>(mobileTalkerMessages, new MessageEqualityComparer());
+            foreach (var pcMessage in pcTalkerMessages.Value) // 遍历此PC端交互方的所有微信消息
+            {
+                if (!mobileMessagesHashSet.Contains(pcMessage))
+                { // 如果移动端不存在此交互方在此时刻的消息记录，将此交互方的此消息记录合并至消息集合
+                    meragedMessages.Add(pcMessage);
+                }
+            }
+        }
+        else
+        { // 如果移动端不存在此PC端的交互方，直接将此交互方所有消息合并至消息集合
+            meragedMessages.AddRange(pcTalkerMessages.Value.AsEnumerable());
+        }
+    }
+    foreach (var talkerMessages in meragedMessages.GroupBy(m => new TalkerKey() { Talker = m.Talker, IsSend = m.IsSend }, new TalkerEqualityComparer()).OrderBy(g => g.Key.Talker))
+    {
+        Console.WriteLine($" ===> {talkerMessages.Key.Talker} {(talkerMessages.Key.IsSend ? "Send" : "Receive")} {talkerMessages.Count()} messsages totally.");
+        var uniqueMessages = new HashSet<WechatMessage>(talkerMessages, new MessageEqualityComparer());
+        Console.WriteLine($"\t===> Removed {talkerMessages.Count() - uniqueMessages.Count()} duplicated messages.");
+    }
+
+    return meragedMessages;
+}

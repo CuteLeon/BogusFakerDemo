@@ -5,6 +5,11 @@ VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WechatMessageMerageDemo", "WechatMessageMerageDemo\WechatMessageMerageDemo.csproj", "{CB6FB759-0DE7-41DC-960C-F3A1501A5389}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{7ED9BBAB-905A-4CB1-A994-174378BF2AF3}"
+	ProjectSection(SolutionItems) = preProject
+		FakeCode.txt = FakeCode.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
