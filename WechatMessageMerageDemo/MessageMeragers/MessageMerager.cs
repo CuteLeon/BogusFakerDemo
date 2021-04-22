@@ -17,7 +17,9 @@ namespace WechatMessageMerageDemo.MessageMeragers
             foreach (var talkerMessages in messagesByTalker)
             {
                 Console.WriteLine($" ===> {talkerMessages.Key.Talker} {(talkerMessages.Key.IsSend ? "Send" : "Receive")} {talkerMessages.Count()} messsages totally.");
-                var uniqueMessages = talkerMessages.GroupBy(m => m.CreateTime, new MessageDateEqualityComparer()).ToList();
+                var uniqueMessages = talkerMessages
+                    .GroupBy(m => m.CreateTime, new MessageDateEqualityComparer())
+                    .ToList();
                 Console.WriteLine($"\t===> Removed {talkerMessages.Count() - uniqueMessages.Count()} duplicated messages.");
             }
 
