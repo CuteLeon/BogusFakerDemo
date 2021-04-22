@@ -18,14 +18,18 @@ namespace WechatMessageMerageDemo.DataProviders
                 .RuleFor(m => m.Talker, faker => faker.PickRandom(this.Talkers))
                 .RuleFor(m => m.IsSend, faker => faker.Random.Bool())
                 .RuleFor(m => m.Content, faker => faker.Lorem.Text())
-                .RuleFor(m => m.CreateTime, faker => faker.Date.Between(new DateTime(2021, 5, 1, 12, 0, 0), new DateTime(2021, 5, 1, 13, 0, 0)).ToString("yyyy-MM-dd HH:mm:000"));
+                .RuleFor(m => m.CreateTime, faker => faker.Date
+                    .Between(
+                        new DateTime(2021, 5, 1, 12, 0, 0), 
+                        new DateTime(2021, 5, 1, 13, 0, 0))
+                    .ToString("yyyy-MM-dd HH:mm:000"));
         }
 
         public virtual IEnumerable<WechatMessage> GetWechatMessages()
         {
             return this.MessageFaker
                 .GenerateForever()
-                .Take(new Random().Next(200, 500))
+                .Take(new Random().Next(1000, 2000))
                 .ToList();
         }
     }
